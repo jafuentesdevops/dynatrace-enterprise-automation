@@ -1,0 +1,16 @@
+// DQL Query to correlate API Latency with Cart Abandonment
+// Target: E-commerce Checkout Service
+
+fetch biz.events
+| filter event.provider == "www.checkout-service"
+| parse event.payload, "JSON:cart_data"
+| fieldsAdd cart_value = toDouble(cart_data[total])
+| filter event.type == "checkout.attempt"
+| lookup [fetch dt.entity.service], sourceField:service_id, lookupField:id
+| summarize 
+    total_revenue = sum(cart_value), 
+    failed_attempts = countIf(event.status != "success"),
+    avg_latency = avg(duration) 
+  by: bin(timestamp, 1h)
+| fieldsAdd revenue_at_risk = if(avg_latency > 2000, total_revenue * 0.15, 0)
+| sort timestamp desc
