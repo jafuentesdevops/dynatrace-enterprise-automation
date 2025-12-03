@@ -1,0 +1,26 @@
+manifestVersion: "1.0"
+
+projects:
+- name: infrastructure_base
+  path: projects/infra
+
+environmentGroups:
+- name: production_cluster
+  environments:
+  - name: prod_us_east
+    url:
+      type: environment
+      value: PROD_URL
+    auth:
+      token:
+        name: DT_API_TOKEN
+
+- name: staging_cluster
+  environments:
+  - name: stage_eu_west
+    url:
+      type: environment
+      value: STAGE_URL
+    auth:
+      token:
+        name: DT_API_TOKEN
